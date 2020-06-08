@@ -1,0 +1,53 @@
+.routine-list-body-btn {
+  border-radius: 6px;
+  background-color: #343a40;
+  color: #fff;
+  text-align: center;
+  margin-left: 23px;
+  margin-right: 23px;
+}
+
+.quize-list-english {
+  padding: 10px;
+  border: 1px solid #bbb;
+  width: 300px;
+  text-align: center;
+}
+
+.quize-list-japanese {
+  padding: 10px;
+  border: 1px solid #bbb;
+  width: 300px;
+  text-align: center;
+}
+
+.quize-btn {
+  margin: 10px;
+  margin-top: 35px;
+  border-radius: 3px;
+}
+
+.english-new {
+  margin: 10px;
+  margin-top: 50px;
+  border-radius: 3px;
+  margin-left: 100px;
+}
+
+.english-label {
+  margin-right: 10px;
+}
+
+.japanese-label {
+  margin-right: 10px;
+}
+
+.japanese-form-group {
+  margin-top: 20px;
+}
+
+.copy-form {
+  margin-bottom: 1rem;
+  margin-left: 30px;
+}
+
