@@ -10,14 +10,32 @@
             <button @click="Recent()" class="quize-btn btn-outline-success">Recent</button>
         </span>
         <span id="content">
+            <button @click="Priority()" class="quize-btn btn-outline-danger">priority</button>
+            <select v-model="priority">
+                <option v-for="option in options" v-bind:value="option.name" v-bind:key="option.id">
+                    {{ option.name }}
+                </option>
+            </select>
+        </span>
+        <span id="content">
             <button @click="completeList()" class="quize-btn btn-outline-dark">completeList</button>
         </span>
+
+        <!-- 英語、日本語の単語の非表示ボタン -->
         <span id="content" v-if="showHiddenquize">
-            <button @click="hiddenAllAnswer()" class="quize-btn btn-outline-danger">hiddenAnswer</button>
+            <button @click="hiddenAllAnswer()" class="quize-btn btn-outline-danger">hidden</button>
         </span>
+
+        <!-- 直近で登録した単語の非表示ボタン -->
         <span id="content" v-if="showquizeCurrent">
-            <button @click="hiddenCurrentAllAnswer()" class="quize-btn btn-outline-danger">hiddenAnswer</button>
+            <button @click="hiddenCurrentAllAnswer()" class="quize-btn btn-outline-danger">hidden</button>
         </span>
+
+        <!-- 優先順位で表示する単語の非表示ボタン -->
+        <span id="content" v-if="showquizePriority">
+            <button @click="hiddenPriorityAllAnswer()" class="quize-btn btn-outline-danger">hidden</button>
+        </span>
+
 
         <table class="routines-list" v-if="showquize">
             <tr>
@@ -61,6 +79,34 @@
                         answer
                     </button>
                     <button class="routine-list-body-btn" @click="hiddenAnswer(item.id)">
+                        cancel
+                    </button>
+                </td>
+                <td class="quize-list-english" v-if="item.value">{{ item.english }}</td>
+                <td class="quize-list-english" v-else></td>
+                <td class="quize-list-english" v-if="item.deleted_at == null">
+                    <button class="routine-list-body-btn" @click="complete(item.id)">
+                        complete
+                    </button>
+                </td>
+                <td class="quize-list-english" v-else>{{ item.deleted_at }}</td>
+            </tr>
+        </table>
+
+        <table class="routines-list" v-if="priority_showquize">
+            <tr>
+                <td class="task-list-tilte">japanese</td>
+                <td class="task-list-tilte">answer</td>
+                <td class="task-list-tilte">english</td>
+                <td class="task-list-tilte">study</td>
+            </tr>
+            <tr v-for="item in quizepriorityData" :key="item.id" class="card-wrap">
+                <td class="quize-list-japanese">{{ item.japanese }}</td>
+                <td class="quize-list-english">
+                    <button class="routine-list-body-btn" @click="showPriorityAnswer(item.id)">
+                        answer
+                    </button>
+                    <button class="routine-list-body-btn" @click="hiddenPriorityAnswer(item.id)">
                         cancel
                     </button>
                 </td>
@@ -135,14 +181,30 @@ export default {
   name: 'quize',
   data() {
       return {
-          showquize:false,
-          english_showquize:false,
-          showquizeCurrent:false,
+        // クイズデータ定義
           quizeData:'',
           quizeCurrnetData:'',
-          answerData:false,
+        　quizepriorityData:'',
+        　completeData:'',
+
+        // クイズの表示可否
+          showquize:false,
+          showquizeCurrent:false,
+          showquizePriority:false,
+          english_showquize:false,
+        　priority_showquize:false,
           showCompleteList:false,
-          completeData:'',
+
+        // 非表示ボタン
+          showHiddenquize:false,
+
+        //  優先順位用の初期データ
+          priority: '',
+          options: [
+            { id: 1, name: 'High' },
+            { id: 2, name: 'Middle' },
+            { id: 3, name: 'Low' }
+          ],
       }
   },
 
@@ -150,12 +212,14 @@ export default {
     JapaneseRandom : function() {
         axios.post('english_practice/list', {
             }).then(response  => {
-                this.showCompleteList = false;
                 this.showquize = true;
-                this.showquizeCurrent = false;
-                this.quizeData = response.data;
                 this.showHiddenquize = true;
-                this.english_showquize = false;
+                this.english_showquize = false,
+                this.showquizeCurrent = false,
+                this.priority_showquize = false,
+                this.showquizePriority = false,
+                this.showCompleteList = false,
+                this.quizeData = response.data;
             }).catch(err => {
                 console.log('err:', err);
             });
@@ -164,12 +228,14 @@ export default {
     EnglishRandom : function() {
         axios.post('english_practice/list', {
             }).then(response  => {
-                this.showCompleteList = false;
-                this.showquize = false;
                 this.english_showquize = true;
-                this.showquizeCurrent = false;
-                this.quizeData = response.data;
                 this.showHiddenquize = true;
+                this.showquize = false;
+                this.showquizeCurrent = false;
+                this.priority_showquize = false;
+                this.showquizePriority = false,
+                this.showCompleteList = false;
+                this.quizeData = response.data;
             }).catch(err => {
                 console.log('err:', err);
             });
@@ -178,15 +244,48 @@ export default {
     Recent : function(){
         axios.post('english_practice/cerruntList', {
             }).then(response  => {
-                this.showCompleteList = false;
                 this.showquizeCurrent = true;
                 this.showquize = false;
-                this.quizeCurrnetData = response.data;
                 this.english_showquize = false;
-                console.log(this.quizeCurrnetData);
+                this.priority_showquize = false;
+                this.showquizePriority = false,
+                this.showCompleteList = false;
+                this.quizeCurrnetData = response.data;
             }).catch(err => {
                 console.log('err:', err);
             });
+    },
+
+    Priority : function(){
+        axios.post('english_practice/priorityList/' + this.priority, {
+            }).then(response  => {
+                this.priority_showquize = true;
+                this.showquizePriority = true,
+                this.showHiddenquize = false;
+                this.showquize = false;
+                this.english_showquize = false;
+                this.showquizeCurrent = false;
+                this.showCompleteList = false;
+                this.quizepriorityData = response.data;
+                console.log(response.data);
+            }).catch(err => {
+                console.log('err:', err);
+            });
+    },
+
+    completeList: function(){
+        axios.post('english_practice/completeList', {
+        }).then(response  => {
+            this.showCompleteList = true;
+            this.showquizePriority = false,
+            this.showquize = false;
+            this.english_showquize = false;
+            this.showquizeCurrent = false;
+            this.showHiddenquize = false;
+            this.completeData = response.data;
+        }).catch(err => {
+            console.log('err:', err);
+        });
     },
 
     showAnswer : function(id){
@@ -199,6 +298,23 @@ export default {
 
     hiddenAnswer : function(id){
         this.quizeData.forEach((object, index) => {
+            if(object.id == id){
+                this.$set(object,'value',false);
+            }
+        });
+    },
+
+    showPriorityAnswer : function(id){
+        console.log(id);
+        this.quizepriorityData.forEach((object, index) => {
+            if(object.id == id){
+                this.$set(object,'value','answer');
+            }
+        });
+    },
+
+    hiddenPriorityAnswer : function(id){
+        this.quizepriorityData.forEach((object, index) => {
             if(object.id == id){
                 this.$set(object,'value',false);
             }
@@ -227,6 +343,12 @@ export default {
         });
     },
 
+    hiddenPriorityAllAnswer : function(){
+        this.quizepriorityData.forEach((object, index) => {
+            this.$set(object,'value',false);
+        });
+    },
+
     hiddenCurrentAllAnswer : function(){
         this.quizeCurrnetData.forEach((object, index) => {
             this.$set(object,'value',false);
@@ -240,19 +362,6 @@ export default {
             window.location.reload();
         }).catch(err => {
             console.log(err);
-        });
-    },
-
-    completeList: function(){
-        axios.post('english_practice/completeList', {
-        }).then(response  => {
-            this.showquize = false;
-            this.completeData = response.data;
-            this.showCompleteList = true;
-            this.showquizeCurrent = false;
-            console.log(this.completeData);
-        }).catch(err => {
-            console.log('err:', err);
         });
     },
 

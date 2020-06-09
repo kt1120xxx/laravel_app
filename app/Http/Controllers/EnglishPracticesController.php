@@ -33,6 +33,23 @@ class EnglishPracticesController extends Controller
         return $current_english;
     }
 
+    public function priorityList($priority)
+    {
+        if($priority == 'High'){
+            $priority_num = 1;
+        }elseif($priority == 'Middle'){
+            $priority_num = 2;
+        }elseif($priority == 'Low'){
+            $priority_num = 3;
+        }else{
+            $priority_num = 0;
+            $priority_english = EnglishPractice::whereNull('deleted_at')->get();
+        }
+
+        $priority_english = EnglishPractice::whereNull('deleted_at')->where('priority',$priority_num)->get();
+        return $priority_english;
+    }
+
     public function complete($id)
     {
         $complete = EnglishPractice::find($id);
@@ -62,19 +79,20 @@ class EnglishPracticesController extends Controller
     {
         $word_array = [];
         foreach($request->request as $key => $param){
-            if(strpos($key,'english')!== false||strpos($key,'japanese')!== false){
+            if(strpos($key,'english')!== false||strpos($key,'japanese')!== false||strpos($key,'priorty')!== false){
                 array_push($word_array,$param);
             }
         }
         foreach($word_array as $key => $word){
-            if($key%2==0){
+
+            if($key==0){
                 $english = $word;
-            }else{
+            }elseif($key==1){
                 $japanese = $word;
                 EnglishPractice::insert([
                     'english' => $english,
                     'japanese' => $japanese,
-                    'priority' => 0,
+                    'priority' => $word_array[2],
                 ]);    
             }
         }

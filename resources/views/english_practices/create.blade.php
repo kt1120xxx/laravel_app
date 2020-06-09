@@ -29,7 +29,12 @@
                             name="japanese"
                         >
                     </div>
-                    <div id="addEnglishForm"></div>
+                    <span>priorty</span>
+                    <select name="priorty">
+                        <option value="1">High</option>
+                        <option value="2">Middle</option>
+                        <option value="3">Low</option>
+                    </select>
                     <div class="mt-5">
                         <button type="submit" class="btn btn-primary">
                             new
@@ -41,7 +46,6 @@
                     </div>
                 </fieldset>
             </form>
-            <button id="addEnglishButton" class="btn btn-outline-primary">add English</button>
         </div>
     </div>
 @endsection

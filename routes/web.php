@@ -49,6 +49,7 @@ Route::group(['prefix' => 'english_practice'], function() {
     Route::get('/','EnglishPracticesController@index')->name('english_practicetop');
     Route::post('/list','EnglishPracticesController@list');
     Route::post('/cerruntList','EnglishPracticesController@cerruntList');
+    Route::post('/priorityList/{priority}','EnglishPracticesController@priorityList');
     Route::post('/complete/{id}','EnglishPracticesController@complete');
     Route::post('/completeList','EnglishPracticesController@completeList');
     Route::post('/returnItem/{id}','EnglishPracticesController@returnItem');
