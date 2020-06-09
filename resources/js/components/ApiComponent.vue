@@ -1,11 +1,13 @@
 <template>
 <!-- 外枠 -->
     <div>
-        <div class="searching-wrap">
+        <button @click="openSearch()">けんさく</button>
+        <div class="searching-wrap" v-if="showSearch">
             <div>
                 <input type="text" v-model="searchTitle" class="title-form modal-form">
             </div>
             <button @click="searchData(searchTitle)" class="modal-edit-button">けんさく</button>
+            <button @click="closeSearch()" class="modal-edit-button">きゃんせる</button>
         </div>
 
         <div v-if="searchFrom">
@@ -103,6 +105,7 @@ export default {
     props: ["posts"],
     data() {
         return {
+            showSearch:false,
             showContent: false,
             saved: false,
             id: '',
@@ -126,6 +129,12 @@ export default {
     },
 
     methods: {
+        openSearch: function(){
+            this.showSearch = true
+        },
+        closeSearch: function(){
+            this.showSearch = false
+        },
         openModal: function(){
             this.showContent = true
         },
